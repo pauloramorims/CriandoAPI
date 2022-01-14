@@ -1,0 +1,15 @@
+C:\Users\paulo.silva\Dotnet\mycode\bin\Debug\net6.0\mycode.exe
+C:\Users\paulo.silva\Dotnet\mycode\bin\Debug\net6.0\mycode.deps.json
+C:\Users\paulo.silva\Dotnet\mycode\bin\Debug\net6.0\mycode.runtimeconfig.json
+C:\Users\paulo.silva\Dotnet\mycode\bin\Debug\net6.0\mycode.dll
+C:\Users\paulo.silva\Dotnet\mycode\bin\Debug\net6.0\ref\mycode.dll
+C:\Users\paulo.silva\Dotnet\mycode\bin\Debug\net6.0\mycode.pdb
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.csproj.AssemblyReference.cache
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.AssemblyInfoInputs.cache
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.AssemblyInfo.cs
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.csproj.CoreCompileInputs.cache
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.dll
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\ref\mycode.dll
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.pdb
+C:\Users\paulo.silva\Dotnet\mycode\obj\Debug\net6.0\mycode.genruntimeconfig.cache
