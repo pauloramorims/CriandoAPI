@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LvOdqqKURvCbFKm1YjWTjkmc6aIssHkBiIHkX8D0lxNwQYfcltZJTtfs+gGWS9lEJ+hLMmjoxi+zZzGFlTfVKQ==",
+  "dgSpecHash": "VrNwjIIuQBP9WUbH7df3hSWKgWX1GXMal0a9u4zyCE6ckJNXYJL7eWel0b3qmj0QJH+QhRp/5WfIp7NfZOhzQA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\paulo.silva\\Dotnet\\mycode\\api\\api.csproj",
+  "projectFilePath": "C:\\Users\\ricar\\Documents\\ProgramasCpp\\CriandoAPI\\mycode\\api\\api.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
