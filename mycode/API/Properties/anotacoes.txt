@@ -1,0 +1,25 @@
+REST - Representational State Transfer
+    Projetadas para recursos
+        Se tratam qualquer tipo de objeto, dados ou serviço que meu cliente possa acessar
+    
+    Iremos pensar sempre em substantivo e não verbo
+                      POST   →   https://localhost:3001/saveproduct
+ FORMA INCORRETA →    PUT    →   https://localhost:3001/editproduct
+                      GET    →   https://localhost:3001/getproduct/3
+                      DELETE →   https://localhost:3001/deletetproduct/3
+
+                      POST   →   https://localhost:3001/product
+ FORMA CORRETA   →    PUT    →   https://localhost:3001/product/{ID}
+                      GET    →   https://localhost:3001/product/
+                      DELETE →   https://localhost:3001/product/{ID}
+
+
+
+    Independencia de plataforma → qualquer cliente é capaz de chamar a API, independentemente de 
+                                como a API está implementada internamente.
+
+    Evolução do serviço → A API deve ser capaz de evoluir e adcionar funcionalidades independentemente 
+                         dos aplicativos do cliente. 
+
+STATUS CODE - Resposta HTTP
+
