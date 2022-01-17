@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);   /*resposonsavel por criar minha aplicacao web   */
 var app = builder.Build();                          /*nosso hosting, aquele que vai escutar oq o usuario quer acessar*/
 
 //endpoint abaixo!
-app.MapGet("/", () => "Hello World! 5");  //toda vez que digitar o endereco da minha aplicacao e barra
+app.MapGet("/", () => "Hello World! 5");                 //toda vez que digitar o endereco da minha aplicacao e barra
 
 app.MapPost ("/", () => new {Name = "Paulo", Age= 25 }); //Criando Objeto Anônimo, o proprio C# converte para o tipo JSON
 
@@ -32,9 +34,15 @@ app.MapGet("/getproduct/{code}", ([FromRoute]string code) => {
     return code;
 });
 
+//→ Via Header
+app.MapGet("/getproductbyheader", (HttpRequest request) => 
+{
+    request.Header["product-code"].ToString();
+}); //HttpRequest é responsável por receber a solicitação do usuário no endpoint
+
 app.Run();
 
 public class Product {
     public string Code { get; set; }
     public string Name { get; set; }
-}
+};
