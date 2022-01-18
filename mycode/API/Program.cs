@@ -98,10 +98,26 @@ public static class ProductRepository{ //A cada requisição que eu realizar, a 
 }
 
 public class Product { //Minha tabela
+   
     public int ID { get; set; }
     public string Code { get; set; }
     public string Name { get; set; }
+    public string Description { get; set; }
+    public int CategoryId { get; set; }    //Relacionamento de 1:1;
+    public Category Category { get; set; } //Relacionamento de 1:1;
+    public List<Tag> Tags { get; set; }    //Relacionamento de 1:N;
 };
+
+ public class Category {
+    public int ID { get; set; }    
+    public string Name { get; set; }
+}
+
+public class Tag {
+    public int ID { get; set; }
+    public string Name{ get; set; }
+    public int ProductId { get; set; }
+}
 
 public class ApplicationDbContext : DbContext {
     public DbSet<Product> Products { get; set; }
@@ -111,4 +127,15 @@ public class ApplicationDbContext : DbContext {
         options.UseSqlServer(
             "Server=localhost;Database=Products; User Id=sa;Password=631018@Pra;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
     }
+
+    protected override void OnModelCreating(ModelBuilder builder) //Configurando minhas colunas
+    {
+        builder.Entity <Product> ()
+            .Property(p => p.Description).HasMaxLength(500).IsRequired(false);
+        builder.Entity <Product> ()
+            .Property(p => p.Name).HasMaxLength(500).IsRequired();
+        builder.Entity <Product> ()
+            .Property(p => p.Code).HasMaxLength(20).IsRequired();
+    }
+
 }

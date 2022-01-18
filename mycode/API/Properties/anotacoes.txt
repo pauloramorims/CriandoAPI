@@ -21,8 +21,8 @@ REST - Representational State Transfer
     Evolução do serviço → A API deve ser capaz de evoluir e adcionar funcionalidades independentemente 
                          dos aplicativos do cliente. 
 
-STATUS CODE - Resposta HTTP
-    200 - 599
+    STATUS CODE - Resposta HTTP
+        200 - 599
 
 MODO DEBUG NO VS CODE - 
     F5 para configurar e criar a pasta .vscode;
@@ -80,9 +80,18 @@ Entity Framework Core
                 }
             }
         no powershell → dotnet tool install --global dotnet-ef
-
-    criar migration
-        arquivo C# que adicona realiza as modificacoes no meu banco de dados;
-                                                
-        no powershell → dotnet ef migrations add CreateProduct ← nome da minha migration
     
+    Migration
+        criar migration
+            arquivo C# que adicona realiza as modificacoes no meu banco de dados;                                       
+            no powershell → dotnet ef migrations add CreateProduct ← nome da minha migration;
+        Atualizar Migration
+            no powershell → dotnet ef database update
+
+        Voltar para uma versao anterior → CUIDADO, PERDE OS DADOS QUE JÁ ESTIVEREM SALVO NELA
+         no powershell → dotnet ef database update → 20220118183315_CreateProduct ← nome da minha migration;
+
+
+
+
+
