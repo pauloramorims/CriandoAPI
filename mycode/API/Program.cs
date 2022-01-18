@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);   /*resposonsavel por criar minha aplicacao web   */
 var app = builder.Build();                          /*nosso hosting, aquele que vai escutar oq o usuario quer acessar*/
+builder.Services.AddDbContext<ApplicationDbContext>(); //Servico para realizar comunicação com meu Banco de dados
+
 var configuration = app.Configuration;
 ProductRepository.Init(configuration);
 
@@ -93,7 +96,19 @@ public static class ProductRepository{ //A cada requisição que eu realizar, a 
         Products.Remove(product);
     }
 }
+
 public class Product { //Minha tabela
+    public int ID { get; set; }
     public string Code { get; set; }
     public string Name { get; set; }
 };
+
+public class ApplicationDbContext : DbContext {
+    public DbSet<Product> Products { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        options.UseSqlServer(
+            "Server=localhost;Database=Products; User Id=sa;Password=631018@Pra;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
+    }
+}

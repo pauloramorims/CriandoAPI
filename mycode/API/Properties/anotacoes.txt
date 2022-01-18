@@ -22,7 +22,7 @@ REST - Representational State Transfer
                          dos aplicativos do cliente. 
 
 STATUS CODE - Resposta HTTP
-    201 - 599
+    200 - 599
 
 MODO DEBUG NO VS CODE - 
     F5 para configurar e criar a pasta .vscode;
@@ -48,3 +48,41 @@ DOCKER
     Instalar WSL;
         Executar CMD no modo administrador;
         digitar wsl --install
+
+
+REPOSITÓRIO - GitHub
+
+    …or create a new repository on the command line
+        echo "# teste" >> README.md
+        git init
+        git add README.md
+        git commit -m "first commit"
+        git branch -M main
+        git remote add origin "LINK"
+        git push -u origin main
+    
+    …or push an existing repository from the command line
+        git remote add origin "LINK"
+        git branch -M main
+        git push -u origin main
+
+
+Entity Framework Core
+    Configurar
+       Criar uma classe de configuração 
+            public class ApplicationDbContext : DbContext 
+            {
+                public DbSet<Product> Products { get; set; }
+
+                protected override void OnConfiguring(DbContextOptionsBuilder options)
+                {
+                    options.UseSqlServer("Server=localhost;Database=Products; User Id=sa;Password=631018@Pra;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
+                }
+            }
+        no powershell → dotnet tool install --global dotnet-ef
+
+    criar migration
+        arquivo C# que adicona realiza as modificacoes no meu banco de dados;
+                                                
+        no powershell → dotnet ef migrations add CreateProduct ← nome da minha migration
+    
