@@ -4,6 +4,8 @@ using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);   /*resposonsavel por criar minha aplicacao web   */
 var app = builder.Build();                          /*nosso hosting, aquele que vai escutar oq o usuario quer acessar*/
+var configuration = app.Configuration;
+ProductRepository.Init(configuration);
 
 //endpoint abaixo!
 app.MapGet("/", () => "Hello World! 5");                 //toda vez que digitar o endereco da minha aplicacao e barra
@@ -17,10 +19,6 @@ app.MapGet ("/AddHeader", (HttpResponse response) => //Estou adicionando um cabe
     return new {Name = "Paulo", Age= 25 };
 });
 
-app.MapPost("/products", (Product product) => {  //Enviar uma informação atraves do Body//Adicionando um produto a minha lista
-    ProductRepository.Add(product);
-});
-
 //↓↓ Extrair relatório do meu endpoint: Numero de usuários que acessou meu sistema
 //↓↓ Através de parâmetros via URL: 2 tipos
 
@@ -29,39 +27,61 @@ app.MapGet("/getproduct", ([FromQuery]string dateStart, [FromQuery] string dateE
     return dateStart + " - " + dateEnd;
 });*/
 
-//api.app.com/users/{code}  → Via rota
-app.MapGet("/products/{code}", ([FromRoute]string code) => {
-    var product = ProductRepository.GetBy(code);
-    return product;
-});
-
 //→ Via Header
 app.MapGet("/getproductbyheader", (HttpRequest request) => 
 {
     request.Headers["product-code"].ToString();
 }); //HttpRequest é responsável por receber a solicitação do usuário no endpoint
 
+//api.app.com/users/{code}  → Via rota
+app.MapGet("/products/{code}", ([FromRoute]string code) => {
+    var product = ProductRepository.GetBy(code);
+    
+    if(product != null)
+        return Results.Ok(product);
+    return Results.NotFound();
+        
+});
+
+app.MapPost("/products", (Product product) => {  //Enviar uma informação atraves do Body//Adicionando um produto a minha lista
+    ProductRepository.Add(product);
+    return Results.Created($"/products/{product.Code}", product.Code);
+});
+
 app.MapPut("/products", (Product product) => {    //endpoint para editar meus produtos
     var productSaved = ProductRepository.GetBy(product.Code);
     productSaved.Name = product.Name;
+    return Results.Ok();
 });
 
-app.MapDelete("/products/{code}", ([FromRoute]string code) => {
+app.MapDelete("/products/{code}", ([FromRoute]string code) => { //endpoint para deletar algum produto
     var productSaved = ProductRepository.GetBy(code);
     ProductRepository.Remove(productSaved);
-    
+
+    if(productSaved != null)
+        return Results.Ok(productSaved);
+    return Results.NotFound();
+});
+
+app.MapGet("/configuration/database", (IConfiguration configuration) =>{
+    return Results.Ok($"{configuration["database:connection"]}/{configuration["database:Port"]}");
 });
 
 app.Run();
 
 //Toda vez que rodo meu servidor a memoria será perdida para um método do tipo List, se estivesse em um banco de dados isso nãoa conteceria pois estaria num arquivo e não na memória...
 public static class ProductRepository{ //A cada requisição que eu realizar, a classe é construida do zero. Para q isso n aconteça utilizamos 'static'
-    public static List<Product> Products { get; set; } //Método para adicionar um poduto
-    public static void Add(Product product) //Método para adicionar um poduto
+    
+    public static List<Product> Products { get; set; } = Products = new List<Product>();//Inicializando minha lista
+    
+    public static void Init(IConfiguration configuration)
     {
-        if (Products == null)   //Conferindo se alista está vazia
-            Products = new List<Product>();
+        var products = configuration.GetSection("Products").Get<List<Product>>();
+        Products = products; //A lista que iniciei é igual a lista que estou injentando através do IConfiguration
+    }
 
+    public static void Add(Product product) //Método para adicionar um poduto
+    {      
         Products.Add(product);
     }
 

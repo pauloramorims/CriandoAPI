@@ -22,4 +22,29 @@ REST - Representational State Transfer
                          dos aplicativos do cliente. 
 
 STATUS CODE - Resposta HTTP
+    201 - 599
 
+MODO DEBUG NO VS CODE - 
+    F5 para configurar e criar a pasta .vscode;
+    F5 para rodar o DEBUG;
+    Pode adcionar um breakpoint;
+    F11 entro dentro dos métodos que estou chamando;
+    F10 para avançar linha a linha;
+    F5 para sair do breakpoint;
+
+CONFIGURAÇÃO - appsettings.json
+    Toda aplicação precisa de uma configuração 
+        Qual banco de dados vai usar, string de conexão;
+            Não guardar esses dados dentro do código (HARDCODE)
+    IConfiguration
+
+AMBIENTES DE DESENVOLVIMENTO - launchSettings.json  
+    Profiles → "ASPNETCORE_ENVIRONMENT": "Development" ← posso alterar de acordo com o nome que 
+    ,                                                    dei para meu ambiente em appsettings
+    É importante pois posso configurar meu Endpoint para rodar apenas em um ambiente específico;
+        if(app.Environment.IsStaging())
+
+DOCKER
+    Instalar WSL;
+        Executar CMD no modo administrador;
+        digitar wsl --install
