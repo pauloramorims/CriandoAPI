@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);   /*resposonsavel por criar minha aplicacao web   */
 builder.Services.AddSqlServer<ApplicationDbContext>(builder.Configuration["Database:SqlServer"]); //Servico para realizar comunicação com meu Banco de dados
@@ -36,45 +37,84 @@ app.MapGet("/getproductbyheader", (HttpRequest request) =>
 }); //HttpRequest é responsável por receber a solicitação do usuário no endpoint
 
 //api.app.com/users/{code}  → Via rota
-app.MapGet("/products/{code}", ([FromRoute]string code) => {
-    var product = ProductRepository.GetBy(code);
-    
-    if(product != null)
-        return Results.Ok(product);
-    return Results.NotFound();
+
+app.MapGet("/products/{id}", ([FromRoute]int id, ApplicationDbContext context) => {
+    try
+    {
+        var product = context.Products               //↑injetando o contexto do EF
+            .Include(p => p.Category)                //←Estou incluindo na busca os relacionamentos que eu quero que venha
+            .Include(p => p.Tags)                    
+            .Where(p => p.Id == id).First();             //É possível realizar a busca completa de outro modo, entretanto deve-se tomr cuidado pois pode onerar seu banco de dados e servidor
+        
+        return Results.Ok(product);           
+    }
+    catch(Exception)
+    {
+        return Results.NotFound();
+    }
         
 });
-                        //↓Vem do body do meu endpoint↓   ↓Servico do AspNet configurado nas primeitas linhas
+//                     //↓Vem do body do meu endpoint↓   ↓Servico do AspNet configurado nas primeitas linhas
 app.MapPost("/products", (ProductRequest productRequest, ApplicationDbContext context) => {  //Enviar uma informação atraves do Body//Adicionando um produto a minha lista
-    var category = context.Category.Where( c => c.Id == productRequest.CategoryId).First(); //.ToList() ↓ Daria acesso a todas as categorias, mas quero consultar no banco de dados pelo ID da categoria
     
-    var product = new Product {
-        Code = productRequest.Code,
-        Name = productRequest.Name,
-        Description = productRequest.Description,
-        Category = category
-    };
+        var category = context.Category.Where( c => c.Id == productRequest.CategoryId).First(); //.ToList() ↓ Daria acesso a todas as categorias, mas quero consultar no banco de dados pelo ID da categoria
+        
+        var product = new Product {
+            Code = productRequest.Code,
+            Name = productRequest.Name,
+            Description = productRequest.Description,
+            Category = category
+        };
 
-    
-    context.Products.Add(product);
-    context.SaveChanges(); //Instrução para commitar
-    
+        if(productRequest.Tags != null)
+        {
+            product.Tags = new List<Tag>();
+            foreach (var item in productRequest.Tags)
+            {
+                product.Tags.Add(new Tag { Name = item});
+            }
+        }
+
+        context.Products.Add(product);
+        context.SaveChanges(); //Instrução para commitar
+   
+   
     return Results.Created($"/products/{product.Id}", product.Id);
 });
 
-app.MapPut("/products", (Product product) => {    //endpoint para editar meus produtos
-    var productSaved = ProductRepository.GetBy(product.Code);
-    productSaved.Name = product.Name;
+app.MapPut("/products/{id}", ([FromRoute] int id, ProductRequest productRequest, ApplicationDbContext context) => {    //endpoint para editar meus produtos
+    
+    var product = context.Products  //realizando a consulta com o GET                            
+        .Include(p => p.Tags)                    
+        .Where(p => p.Id == id).First();             
+    var category = context.Category.Where( c => c.Id == productRequest.CategoryId).First();
+
+    product.Code = productRequest.Code;
+    product.Name = productRequest.Name;
+    product.Description = productRequest.Description;
+    product.Category = category;
+    
+    if(productRequest.Tags != null)
+    {
+        product.Tags = new List<Tag>();
+        foreach (var item in productRequest.Tags)
+        {
+            product.Tags.Add(new Tag { Name = item});
+        }
+    }
+
+    context.SaveChanges();
     return Results.Ok();
 });
 
-app.MapDelete("/products/{code}", ([FromRoute]string code) => { //endpoint para deletar algum produto
-    var productSaved = ProductRepository.GetBy(code);
-    ProductRepository.Remove(productSaved);
+app.MapDelete("/products/{id}", ([FromRoute]int id, ApplicationDbContext context) => { //endpoint para deletar algum produto
+    var product = context.Products                     
+        .Where(p => p.Id == id).First();
 
-    if(productSaved != null)
-        return Results.Ok(productSaved);
-    return Results.NotFound();
+    context.Products.Remove(product);
+   
+    context.SaveChanges();
+    return Results.Ok(product);
 });
 
 app.MapGet("/configuration/database", (IConfiguration configuration) =>{
