@@ -91,6 +91,9 @@ Entity Framework Core
         Voltar para uma versao anterior → CUIDADO, PERDE OS DADOS QUE JÁ ESTIVEREM SALVO NELA
          no powershell → dotnet ef database update → 20220118183315_CreateProduct ← nome da minha migration;
 
+    Atualizar
+        no powershell → dotnet tool install --global dotnet-outdated-tool
+        no powershell → dotnet outdated --updated 
 
 
 

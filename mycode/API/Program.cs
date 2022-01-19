@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);   /*resposonsavel por criar minha aplicacao web   */
-var app = builder.Build();                          /*nosso hosting, aquele que vai escutar oq o usuario quer acessar*/
-builder.Services.AddDbContext<ApplicationDbContext>(); //Servico para realizar comunicação com meu Banco de dados
+builder.Services.AddSqlServer<ApplicationDbContext>(builder.Configuration["Database:SqlServer"]); //Servico para realizar comunicação com meu Banco de dados
 
+var app = builder.Build();                          /*nosso hosting, aquele que vai escutar oq o usuario quer acessar*/
 var configuration = app.Configuration;
 ProductRepository.Init(configuration);
 
@@ -45,10 +44,22 @@ app.MapGet("/products/{code}", ([FromRoute]string code) => {
     return Results.NotFound();
         
 });
+                        //↓Vem do body do meu endpoint↓   ↓Servico do AspNet configurado nas primeitas linhas
+app.MapPost("/products", (ProductRequest productRequest, ApplicationDbContext context) => {  //Enviar uma informação atraves do Body//Adicionando um produto a minha lista
+    var category = context.Category.Where( c => c.Id == productRequest.CategoryId).First(); //.ToList() ↓ Daria acesso a todas as categorias, mas quero consultar no banco de dados pelo ID da categoria
+    
+    var product = new Product {
+        Code = productRequest.Code,
+        Name = productRequest.Name,
+        Description = productRequest.Description,
+        Category = category
+    };
 
-app.MapPost("/products", (Product product) => {  //Enviar uma informação atraves do Body//Adicionando um produto a minha lista
-    ProductRepository.Add(product);
-    return Results.Created($"/products/{product.Code}", product.Code);
+    
+    context.Products.Add(product);
+    context.SaveChanges(); //Instrução para commitar
+    
+    return Results.Created($"/products/{product.Id}", product.Id);
 });
 
 app.MapPut("/products", (Product product) => {    //endpoint para editar meus produtos
@@ -71,71 +82,3 @@ app.MapGet("/configuration/database", (IConfiguration configuration) =>{
 });
 
 app.Run();
-
-//Toda vez que rodo meu servidor a memoria será perdida para um método do tipo List, se estivesse em um banco de dados isso nãoa conteceria pois estaria num arquivo e não na memória...
-public static class ProductRepository{ //A cada requisição que eu realizar, a classe é construida do zero. Para q isso n aconteça utilizamos 'static'
-    
-    public static List<Product> Products { get; set; } = Products = new List<Product>();//Inicializando minha lista
-    
-    public static void Init(IConfiguration configuration)
-    {
-        var products = configuration.GetSection("Products").Get<List<Product>>();
-        Products = products; //A lista que iniciei é igual a lista que estou injentando através do IConfiguration
-    }
-
-    public static void Add(Product product) //Método para adicionar um poduto
-    {      
-        Products.Add(product);
-    }
-
-    public static Product GetBy(string code){ //Método para procurar um poduto
-        return Products.FirstOrDefault(p => p.Code == code); //Se não achar na lista, retorna um valor "null"
-    }
-
-    public static void Remove(Product product){ //Método para remover um poduto
-        Products.Remove(product);
-    }
-}
-
-public class Product { //Minha tabela
-   
-    public int ID { get; set; }
-    public string Code { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public int CategoryId { get; set; }    //Relacionamento de 1:1;
-    public Category Category { get; set; } //Relacionamento de 1:1;
-    public List<Tag> Tags { get; set; }    //Relacionamento de 1:N;
-};
-
- public class Category {
-    public int ID { get; set; }    
-    public string Name { get; set; }
-}
-
-public class Tag {
-    public int ID { get; set; }
-    public string Name{ get; set; }
-    public int ProductId { get; set; }
-}
-
-public class ApplicationDbContext : DbContext {
-    public DbSet<Product> Products { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-        options.UseSqlServer(
-            "Server=localhost;Database=Products; User Id=sa;Password=631018@Pra;MultipleActiveResultSets=true;Encrypt=YES;TrustServerCertificate=YES");
-    }
-
-    protected override void OnModelCreating(ModelBuilder builder) //Configurando minhas colunas
-    {
-        builder.Entity <Product> ()
-            .Property(p => p.Description).HasMaxLength(500).IsRequired(false);
-        builder.Entity <Product> ()
-            .Property(p => p.Name).HasMaxLength(500).IsRequired();
-        builder.Entity <Product> ()
-            .Property(p => p.Code).HasMaxLength(20).IsRequired();
-    }
-
-}
